@@ -73,7 +73,7 @@ if __name__ == '__main__':
     copy_code(ssh=ssh1, client=clients[0], file='sender.py')
     copy_code(ssh=ssh2, client=clients[1], file='receiver.py')
     logging.info('Transferring complete')
-    time.sleep(5)
+    time.sleep(2.5)
     logging.info('Create thread 1')
     p1 = Thread(target=exec_command,
                 kwargs={'ssh': ssh1,

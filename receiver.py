@@ -2,7 +2,7 @@ from pprint import pprint
 
 import wiringpi
 
-CYCLES = 40
+CYCLES = 3
 
 wiringpi.wiringPiSetup()
 pins = [2, 3, 12, 13, 14]
@@ -10,11 +10,18 @@ for pin in pins:
     wiringpi.pinMode(pin, wiringpi.INPUT)
 
 data = []
+
+
+def callback():
+    data.append(wiringpi.micros())
+
+
 pin = pins[0]
 start_time = wiringpi.millis()
-while start_time + (CYCLES * 1000) > wiringpi.millis():
-    value = wiringpi.digitalRead(pin)
-    data.append((wiringpi.millis(), value))
-    wiringpi.delay(10)
+wiringpi.wiringPiISR(pin, wiringpi.INT_EDGE_RISING, callback)
 
-pprint(data)
+while start_time + (CYCLES * 1000) > wiringpi.millis():
+    wiringpi.delay(1000)
+
+pprint(data[1:])
+print(len(data[1:]))

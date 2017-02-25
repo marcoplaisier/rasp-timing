@@ -1,8 +1,7 @@
 import wiringpi
-import time
 
-SLEEP_TIME = 1
-CYCLES = 10
+SLEEP_TIME = 100
+CYCLES = 6
 HIGH = 1
 LOW = 0
 
@@ -13,11 +12,13 @@ for pin in pins:
 
 counter = 0
 pin = pins[0]
-time.sleep(2)
+wiringpi.delay(1000)
 
 while counter < CYCLES:
     wiringpi.digitalWrite(pin, HIGH)
-    time.sleep(SLEEP_TIME)
+    wiringpi.delayMicroseconds(SLEEP_TIME)
     wiringpi.digitalWrite(pin, LOW)
-    time.sleep(SLEEP_TIME)
+    wiringpi.delayMicroseconds(SLEEP_TIME)
     counter += 1
+
+print('All done')
