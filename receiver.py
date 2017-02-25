@@ -1,27 +1,40 @@
 from pprint import pprint
 
+import time
 import wiringpi
 
-CYCLES = 3
+CLOCK_LINE = 2
+ENABLE_LINE = 3
+DATA_LINE = 12
+
+enabled = False
 
 wiringpi.wiringPiSetup()
 pins = [2, 3, 12, 13, 14]
 for pin in pins:
     wiringpi.pinMode(pin, wiringpi.INPUT)
 
-data = []
+
+def clock_callback():
+    global enabled
+    if enabled:
+        print((wiringpi.micros(), wiringpi.digitalRead(DATA_LINE)))
 
 
-def callback():
-    data.append(wiringpi.micros())
+def enable_callback():
+    global enabled
+    if not enabled:
+        start = wiringpi.micros()
+        enabled = True
+        end = wiringpi.micros()
+        print('\nEnable clock callback in {} us'.format(end-start))
 
 
-pin = pins[0]
-start_time = wiringpi.millis()
-wiringpi.wiringPiISR(pin, wiringpi.INT_EDGE_RISING, callback)
-
-while start_time + (CYCLES * 1000) > wiringpi.millis():
-    wiringpi.delay(1000)
-
-pprint(data[1:])
-print(len(data[1:]))
+if __name__ == '__main__':
+    print('Start at {}'.format(wiringpi.micros()))
+    start = wiringpi.micros()
+    wiringpi.wiringPiISR(ENABLE_LINE, wiringpi.INT_EDGE_RISING, enable_callback)
+    wiringpi.wiringPiISR(CLOCK_LINE, wiringpi.INT_EDGE_RISING, clock_callback)
+    end = wiringpi.micros()
+    print('\nCallbacks set in {} us'.format(end-start))
+    time.sleep(8)
