@@ -1,6 +1,8 @@
 from pprint import pprint
 
 import time
+
+import logging
 import wiringpi
 
 CLOCK_LINE = 2
@@ -18,23 +20,31 @@ for pin in pins:
 def clock_callback():
     global enabled
     if enabled:
-        print((wiringpi.micros(), wiringpi.digitalRead(DATA_LINE)))
+        logging.info((wiringpi.micros(), wiringpi.digitalRead(DATA_LINE)))
 
 
 def enable_callback():
     global enabled
-    if not enabled:
+    if not enabled and wiringpi.digitalRead(ENABLE_LINE) == wiringpi.HIGH:
         start = wiringpi.micros()
         enabled = True
         end = wiringpi.micros()
-        print('\nEnable clock callback in {} us'.format(end-start))
+        logging.info('\nEnable clock callback in {} us'.format(end-start))
+    elif enabled and wiringpi.digitalRead(ENABLE_LINE) == wiringpi.LOW:
+        start = wiringpi.micros()
+        enabled = False
+        end = wiringpi.micros()
+        logging.info('\nDisable clock callback in {} us'.format(end - start))
+    else:
+        pass
 
 
 if __name__ == '__main__':
-    print('Start at {}'.format(wiringpi.micros()))
+    logging.basicConfig(format='%(asctime)s %(message)s', level='INFO')
+    logging.info('Start at {}'.format(wiringpi.micros()))
     start = wiringpi.micros()
-    wiringpi.wiringPiISR(ENABLE_LINE, wiringpi.INT_EDGE_RISING, enable_callback)
+    wiringpi.wiringPiISR(ENABLE_LINE, wiringpi.INT_EDGE_BOTH, enable_callback)
     wiringpi.wiringPiISR(CLOCK_LINE, wiringpi.INT_EDGE_RISING, clock_callback)
     end = wiringpi.micros()
-    print('\nCallbacks set in {} us'.format(end-start))
+    logging.info('\nCallbacks set in {} us'.format(end-start))
     time.sleep(8)

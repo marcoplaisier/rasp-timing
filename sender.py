@@ -1,9 +1,12 @@
+import logging
 import wiringpi
 
 SLEEP_TIME = 10000
 CYCLES = 6
 HIGH = 1
 LOW = 0
+
+logging.basicConfig(format='%(asctime)s %(message)s', level='INFO')
 
 wiringpi.wiringPiSetup()
 CLOCK_LINE = 2
@@ -45,4 +48,4 @@ if __name__ == '__main__':
     wiringpi.digitalWrite(DATA_LINE, 0)
     wiringpi.digitalWrite(CLOCK_LINE, 0)
 
-    print('All done')
+    logging.info('All done')
