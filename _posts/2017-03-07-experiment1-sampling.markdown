@@ -40,4 +40,4 @@ One thing I will get bored of very easily is switching between Raspberries, movi
     logging.info('Starting processes')
     p1.start()
     p2.start()
-{% highlight python %}
+{% endhighlight %}
